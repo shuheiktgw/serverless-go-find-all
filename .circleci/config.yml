@@ -21,7 +21,9 @@ jobs:
 
     - run:
         name: Install dependencies
-        command: dep ensure
+        command: |
+          dep ensure
+          go get -u github.com/golang/lint/golint
 
     - run:
         name: Test
