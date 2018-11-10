@@ -14,7 +14,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
 )
 
-type Movie struct {
+type movie struct {
 	ID   string `json:"id"`
 	Name string `json:"name"`
 }
@@ -50,9 +50,9 @@ func findAll(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespo
 		}, nil
 	}
 
-	movies := make([]Movie, 0)
+	movies := make([]movie, 0)
 	for _, item := range res.Items {
-		movies = append(movies, Movie{
+		movies = append(movies, movie{
 			ID:   *item["ID"].S,
 			Name: *item["Name"].S,
 		})
