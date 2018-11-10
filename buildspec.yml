@@ -15,13 +15,13 @@ phases:
   pre_build:
     commnds:
       - cd "/go/src/${PACKAGES}"
+      - dep ensure
       - golint -set_exit_status
       - go vet .
       - go test .
 
   build:
     commands:
-      - dep ensure
       - GOOS=linux go build -o main
       - zip $CODEBUILD_RESOLVED_SOURCE_VERSION.zip main
       - aws s3 cp $CODEBUILD_RESOLVED_SOURCE_VERSION.zip s3://$S3_BUCKET/
