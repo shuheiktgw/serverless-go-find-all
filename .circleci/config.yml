@@ -43,4 +43,4 @@ jobs:
 
     - run:
         name: Deploy
-        command: aws lambda update-function-code --function-name FindAllMovies --s3-bucket $S3_BUCKET --s3-key $CIRCLE_CI_SHA1.zip
+        command: aws lambda update-function-code --function-name FindAllMovies --s3-bucket $S3_BUCKET --s3-key $CIRCLE_CI_SHA1.zip --region ap-northeast-1
