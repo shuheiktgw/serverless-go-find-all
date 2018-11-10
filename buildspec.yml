@@ -21,10 +21,11 @@ phases:
 
   build:
     commands:
+      - dep ensure
       - GOOS=linux go build -o main
       - zip $CODEBUILD_RESOLVED_SOURCE_VERSION.zip main
       - aws s3 cp $CODEBUILD_RESOLVED_SOURCE_VERSION.zip s3://$S3_BUCKET/
 
   post_build:
     commands:
-      - aws lambda update-function-code --function-name FindAllMovies --s3-bucket-name $S3_BUCKET --s3-key $CODEBUILD_RESOLVED_SOURCE_VERSION.zip
+      - aws lambda update-function-code --function-name FindAllMovies --s3-bucket $S3_BUCKET --s3-key $CODEBUILD_RESOLVED_SOURCE_VERSION.zip
