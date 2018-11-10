@@ -15,7 +15,6 @@ phases:
   pre_build:
     commnds:
       - cd "/go/src/${PACKAGES}"
-      - dep ensure
       - golint -set_exit_status
       - go vet .
       - go test .
