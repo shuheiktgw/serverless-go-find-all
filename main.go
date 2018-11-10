@@ -3,15 +3,13 @@ package main
 
 import (
 	"encoding/json"
-	"net/http"
-	"os"
-	"strconv"
-
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/aws/external"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
+	"net/http"
+	"os"
 )
 
 type movie struct {
@@ -20,14 +18,6 @@ type movie struct {
 }
 
 func findAll(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-	size, err := strconv.Atoi(request.Headers["Count"])
-	if err != nil {
-		return events.APIGatewayProxyResponse{
-			StatusCode: http.StatusBadRequest,
-			Body:       "Count Header should be a number",
-		}, nil
-	}
-
 	cfg, err := external.LoadDefaultAWSConfig()
 	if err != nil {
 		return events.APIGatewayProxyResponse{
@@ -39,7 +29,6 @@ func findAll(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespo
 	svc := dynamodb.New(cfg)
 	req := svc.ScanRequest(&dynamodb.ScanInput{
 		TableName: aws.String(os.Getenv("TABLE_NAME")),
-		Limit:     aws.Int64(int64(size)),
 	})
 
 	res, err := req.Send()
@@ -70,6 +59,7 @@ func findAll(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespo
 		StatusCode: 200,
 		Headers: map[string]string{
 			"Content-Type": "application/json",
+			"Access-Control-Allow-Origin": "http://localhost:4200",
 		},
 		Body: string(response),
 	}, nil

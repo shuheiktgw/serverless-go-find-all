@@ -1,0 +1,45 @@
+version: 2
+jobs:
+  build:
+    docker:
+    - image: circleci/golang:latest
+
+    working_directory: /go/src/github.com/{{ORG_NAME}}/{{REPO_NAME}}
+
+    environment:
+      S3_BUCKET: shuheiktgw-movies
+
+    steps:
+    - checkout
+
+    - run:
+        name: Install AWS CLI and ZIP
+        command: |
+          apt-get update
+          apt-get install -y zip python-pip python-dev
+          pip install awscli
+
+    - run:
+        name: Install dependencies
+        command: dep ensure
+
+    - run:
+        name: Test
+        command: |
+          golint -set_exit_status
+          go vet .
+          go test .
+
+    - run:
+        name: Build
+        command: |
+          GOOS=linux go build -o main main.go
+          zip $CIRCLE_CI_SHA1.zip main
+
+    - run:
+        name: Push
+        command: aws s3 cp $CIRCLE_CI_SHA1.zip s3://$S3_BUCKET
+
+    - run:
+        name: Deploy
+        command: aws lambda update-function-code --function-name FindAllMovies --s3-bucket $S3_BUCKET --s3-key $CIRCLE_CI_SHA1.zip
